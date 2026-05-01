@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, Bell, Moon, Home, Film, Tv, Plus, Download, Play, Pause, X, Volume2, VolumeX, Maximize, RotateCcw, TrendingUp, Flame, ChevronRight, ChevronDown, Star, Clock, Globe, Loader, ArrowLeft } from 'lucide-react';
 import { Subject, Page, PlayData } from './types';
 import { api } from './api';
-import Hls from 'hls.js';
 
 export function Header({ onNavigate, onSearch }: { onNavigate: (p: Page) => void; onSearch: () => void }) {
   const [err, setErr] = useState(false);
@@ -113,12 +112,33 @@ export function VideoPlayer({ streamUrl, title, onClose }: { streamUrl: string; 
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !streamUrl) return;
-    if (streamUrl.includes('.m3u8') && Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(streamUrl);
-      hls.attachMedia(v);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => v.play().then(() => setPlaying(true)).catch(() => {}));
-      return () => hls.destroy();
+
+    if (streamUrl.includes('.m3u8')) {
+      const loadScript = () => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js';
+        s.onload = () => {
+          const Hls = (window as any).Hls;
+          if (Hls?.isSupported?.()) {
+            const hls = new Hls();
+            hls.loadSource(streamUrl);
+            hls.attachMedia(v);
+            hls.once(Hls.Events.MANIFEST_PARSED, () => v.play().then(() => setPlaying(true)).catch(() => {}));
+          }
+        };
+        document.head.appendChild(s);
+      };
+      if ((window as any).Hls) {
+        const Hls = (window as any).Hls;
+        if (Hls?.isSupported?.()) {
+          const hls = new Hls();
+          hls.loadSource(streamUrl);
+          hls.attachMedia(v);
+          hls.once(Hls.Events.MANIFEST_PARSED, () => v.play().then(() => setPlaying(true)).catch(() => {}));
+        }
+      } else {
+        loadScript();
+      }
     } else {
       v.src = streamUrl;
       v.play().then(() => setPlaying(true)).catch(() => {});
