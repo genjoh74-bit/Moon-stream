@@ -24,3 +24,4 @@ export interface PlayStream { url: string; definition: string; width: number; he
 export interface PlayData { streamList: PlayStream[]; subtitleList: any[]; url?: string; }
 export interface DetailData { subject: Subject; stars: any[]; resource: any; }
 export type Page = 'home' | 'browse' | 'trending' | 'detail' | 'player' | 'movies' | 'tv';
+
