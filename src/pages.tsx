@@ -109,7 +109,7 @@ export function BrowsePage({ onDetail }: { onDetail: (s: Subject) => void }) {
   );
 }
 
-export function DetailPage({ subject, onBack, onWatch, onDetail }: { subject: Subject; onBack: () => void; onWatch: (s: Subject, p?: PlayData) => void; onDetail: (s: Subject) => void }) {
+export function DetailPage({ subject, onBack, onWatch, onDetail }: { subject: Subject; onBack: () => void; onWatch: (s: Subject, p?: any) => void; onDetail: (s: Subject) => void }) {
   const [detail, setDetail] = useState<any>(null);
   const [recommend, setRecommend] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,7 +135,7 @@ export function DetailPage({ subject, onBack, onWatch, onDetail }: { subject: Su
         {year && <span className="bg-black/70 border border-white/20 text-white/70 text-xs px-2 py-1 rounded inline-block mb-3">{year}</span>}
         <h1 className="text-white text-3xl font-black mb-2">{s.title}</h1>
         <div className="flex gap-3 my-5">
-          <button onClick={async () => { setPlayLoading(true); try { const p = await api.play(subject.subjectId); onWatch(subject, p); } catch { onWatch(subject); } finally { setPlayLoading(false); } }} className="flex-1 flex items-center justify-center gap-2 bg-cyan-400 text-black font-bold py-3 rounded-full">
+          <button onClick={async () => { setPlayLoading(true); try { const p = await api.play(subject.subjectId); onWatch(subject, p); } catch (e) { console.error('Play error:', e); onWatch(subject); } finally { setPlayLoading(false); } }} className="flex-1 flex items-center justify-center gap-2 bg-cyan-400 text-black font-bold py-3 rounded-full">
             {playLoading ? <Loader className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4 fill-black" />}
             {playLoading ? 'Loading...' : 'Watch'}
           </button>
