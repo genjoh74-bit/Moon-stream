@@ -20,8 +20,10 @@ export interface Subject {
   imdbRatingCount: number;
   postTitle: string;
 }
-export interface PlayStream { url: string; definition: string; width: number; height: number; }
-export interface PlayData { streamList: PlayStream[]; subtitleList: any[]; url?: string; }
+export interface PlayStream { url: string; proxyUrl: string; resolutions: string; format: string; duration: number; }
+export interface Subtitle { language: string; languageCode: string; url: string; }
+export interface AudioTrack { language: string; languageCode: string; isOriginal: boolean; }
+export interface PlayData { streams?: PlayStream[]; subtitles?: Subtitle[]; audioTracks?: AudioTrack[]; url?: string; }
 export interface DetailData { subject: Subject; stars: any[]; resource: any; }
 export type Page = 'home' | 'browse' | 'trending' | 'detail' | 'player' | 'movies' | 'tv';
 
