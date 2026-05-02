@@ -15,7 +15,22 @@ export const api = {
   trending: (p = 1) => get<{ subjectList: any[] }>(`/trending?page=${p}&perPage=18`),
   hot: () => get<any>('/hot'),
   detail: (id: string) => get<any>(`/detail?subjectId=${id}`),
-  play: (id: string) => get<any>(`/play?subjectId=${id}`),
+  play: (id: string) => get<any>(`/play?subjectId=${id}`).then(data => {
+    if (data.streams) {
+      return {
+        streams: data.streams.map((s: any) => ({
+          url: s.proxyUrl || s.url,
+          proxyUrl: s.proxyUrl,
+          resolutions: s.resolutions,
+          format: s.format,
+          duration: s.duration,
+        })),
+        subtitles: data.subtitles || [],
+        audioTracks: data.audioTracks || [],
+      };
+    }
+    return data;
+  }),
   search: (q: string, p = 1) => get<{ subjectList: any[] }>(`/search?keyword=${encodeURIComponent(q)}&page=${p}&perPage=12`),
   recommend: (id: string) => get<{ subjectList: any[] }>(`/recommend?subjectId=${id}&page=1&perPage=10`),
   homepage: () => get<any>('/homepage'),
