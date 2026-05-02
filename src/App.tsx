@@ -5,11 +5,16 @@ import { HomePage, BrowsePage, TrendingPage, DetailPage } from './pages';
 
 type ViewState = { type: 'home' } | { type: 'browse' } | { type: 'trending' } | { type: 'detail'; subject: Subject } | { type: 'player'; subject: Subject; url: string };
 
-function extractStreamUrl(playData: PlayData | undefined): string | null {
+function extractStreamUrl(playData: any | undefined): string | null {
   if (!playData) return null;
-  const streams = playData.streamList || [];
-  const hls = streams.find((s) => s.url?.includes('.m3u8'));
-  return hls?.url || streams[0]?.url || null;
+  const streams = playData.streams || playData.streamList || [];
+  if (streams.length === 0) return null;
+  const highest = [...streams].sort((a, b) => {
+    const aRes = parseInt(a.resolutions || '0');
+    const bRes = parseInt(b.resolutions || '0');
+    return bRes - aRes;
+  })[0];
+  return highest?.url || highest?.proxyUrl || null;
 }
 
 export default function App() {
